@@ -16,14 +16,13 @@ const {
   handleValidationErrors
 } = require('../middleware/validation');
 
-
 const router = express.Router();
 
 // Apply auth rate limiter to all routes
 router.use(authLimiter);
 
-router.post('/register', register);
-router.post('/login', login);
+router.post('/register', validateUserRegistration, handleValidationErrors, register);
+router.post('/login', validateUserLogin, handleValidationErrors, login);
 router.post('/logout', logout);
 router.post('/forgot-password', forgotPassword);
 router.put('/reset-password/:resettoken', resetPassword);
@@ -33,3 +32,11 @@ router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfile);
 
 module.exports = router;
+
+router.get('/debug', protect, (req, res) => {
+  res.json({
+    success: true,
+    message: 'Auth working',
+    user: req.user
+  });
+});

@@ -4,6 +4,7 @@ const User = require('../models/User');
 // Protect routes
 exports.protect = async (req, res, next) => {
   let token;
+  console.log('Auth headers:', req.headers.authorization);
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
@@ -12,11 +13,13 @@ exports.protect = async (req, res, next) => {
 
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log('Decoded token:', decoded); 
 
       // Get user from token
       req.user = await User.findById(decoded.id).select('-password');
 
       if (!req.user || !req.user.isActive) {
+        console.log('User not found or inactive');
         return res.status(401).json({
           success: false,
           message: 'User not found or inactive'
@@ -34,6 +37,7 @@ exports.protect = async (req, res, next) => {
   }
 
   if (!token) {
+    console.log('No token provided');
     return res.status(401).json({
       success: false,
       message: 'Not authorized, no token'
