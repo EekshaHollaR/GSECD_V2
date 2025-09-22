@@ -22,6 +22,10 @@
     "concurrently": "^9.2.1"
   },
   "dependencies": {
+    "@nivo/calendar": "^0.99.0",
+    "@nivo/core": "^0.99.0",
+    "@nivo/line": "^0.99.0",
+    "@nivo/pie": "^0.99.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   }
