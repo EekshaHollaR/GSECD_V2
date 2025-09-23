@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
 require('dotenv').config();
+const crisisDetectionRoutes = require('./routes/crisis-detection');
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -64,6 +65,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/indicators', indicatorRoutes);
 app.use('/api/crisis', crisisRoutes);
 app.use('/api/external-data', externalDataRoutes);
+app.use('/api/crisis-detection', crisisDetectionRoutes);
 
 // 404 handler
 app.all('*', (req, res) => {
@@ -132,7 +134,6 @@ app.use((error, req, res, next) => {
     })
   });
 });
-
 
 
 
