@@ -4,71 +4,71 @@ const Country = require('../models/Country');
 // @desc    Get all crisis events with filtering
 // @route   GET /api/crisis
 // @access  Private
-exports.getCrisisEvents = async (req, res) => {
-  try {
-    let query = {};
+// exports.getCrisisEvents = async (req, res) => {
+//   try {
+//     let query = {};
     
-    // Build query based on parameters
-    if (req.query.type) {
-      query.crisisType = req.query.type;
-    }
+//     // Build query based on parameters
+//     if (req.query.type) {
+//       query.crisisType = req.query.type;
+//     }
     
-    if (req.query.severity) {
-      query.severity = req.query.severity;
-    }
+//     if (req.query.severity) {
+//       query.severity = req.query.severity;
+//     }
     
-    if (req.query.country) {
-      query['affectedCountries.countryCode'] = req.query.country.toUpperCase();
-    }
+//     if (req.query.country) {
+//       query['affectedCountries.countryCode'] = req.query.country.toUpperCase();
+//     }
     
-    if (req.query.active === 'true') {
-      query.isActive = true;
-      query.endDate = { $exists: false };
-    }
+//     if (req.query.active === 'true') {
+//       query.isActive = true;
+//       query.endDate = { $exists: false };
+//     }
 
-    // Date range filtering
-    if (req.query.startDate || req.query.endDate) {
-      query.startDate = {};
-      if (req.query.startDate) {
-        query.startDate.$gte = new Date(req.query.startDate);
-      }
-      if (req.query.endDate) {
-        query.startDate.$lte = new Date(req.query.endDate);
-      }
-    }
+//     // Date range filtering
+//     if (req.query.startDate || req.query.endDate) {
+//       query.startDate = {};
+//       if (req.query.startDate) {
+//         query.startDate.$gte = new Date(req.query.startDate);
+//       }
+//       if (req.query.endDate) {
+//         query.startDate.$lte = new Date(req.query.endDate);
+//       }
+//     }
 
-    // Execute query with pagination
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 10;
-    const startIndex = (page - 1) * limit;
+//     // Execute query with pagination
+//     const page = parseInt(req.query.page, 10) || 1;
+//     const limit = parseInt(req.query.limit, 10) || 10;
+//     const startIndex = (page - 1) * limit;
 
-    const crises = await CrisisEvent.find(query)
-      .sort({ startDate: -1 })
-      .limit(limit)
-      .skip(startIndex)
-      .populate('affectedCountries.countryCode', 'name region');
+//     const crises = await CrisisEvent.find(query)
+//       .sort({ startDate: -1 })
+//       .limit(limit)
+//       .skip(startIndex)
+//       .populate('affectedCountries.countryCode', 'name region');
 
-    const total = await CrisisEvent.countDocuments(query);
+//     const total = await CrisisEvent.countDocuments(query);
 
-    res.status(200).json({
-      success: true,
-      count: crises.length,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      },
-      data: crises
-    });
-  } catch (error) {
-    console.error('Get crisis events error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error retrieving crisis events'
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       count: crises.length,
+//       pagination: {
+//         page,
+//         limit,
+//         total,
+//         pages: Math.ceil(total / limit)
+//       },
+//       data: crises
+//     });
+//   } catch (error) {
+//     console.error('Get crisis events error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Server error retrieving crisis events'
+//     });
+//   }
+// };
 
 // @desc    Get crisis by ID
 // @route   GET /api/crisis/:id
@@ -248,8 +248,39 @@ exports.getCrisisByCountry = async (req, res) => {
 // @desc    Get active crisis events
 // @route   GET /api/crisis/active
 // @access  Private
+// exports.getActiveCrises = async (req, res) => {
+//   try {
+//     console.log('getActiveCrises called');
+//     const activeCrises = await CrisisEvent.find({
+//       isActive: true,
+//       $or: [
+//         { endDate: { $exists: false } },
+//         { endDate: null },
+//         { endDate: { $gte: new Date() } }
+//       ]
+//     })
+//     .sort({ severity: -1, startDate: -1 })
+//     .populate('affectedCountries.countryCode', 'name region');
+
+//     console.log(`Found ${activeCrises.length} active crises`);
+//     res.status(200).json({
+//       success: true,
+//       count: activeCrises.length,
+//       data: activeCrises
+//     });
+//   } catch (error) {
+//     console.error('Get active crises error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Server error retrieving active crises'
+//     });
+//   }
+// };
+
 exports.getActiveCrises = async (req, res) => {
   try {
+    console.log('Getting active crises...');
+    
     const activeCrises = await CrisisEvent.find({
       isActive: true,
       $or: [
@@ -257,10 +288,10 @@ exports.getActiveCrises = async (req, res) => {
         { endDate: null },
         { endDate: { $gte: new Date() } }
       ]
-    })
-    .sort({ severity: -1, startDate: -1 })
-    .populate('affectedCountries.countryCode', 'name region');
+    }).sort({ severity: -1, startDate: -1 });
 
+    console.log(`Found ${activeCrises.length} active crises`);
+    
     res.status(200).json({
       success: true,
       count: activeCrises.length,
@@ -271,6 +302,64 @@ exports.getActiveCrises = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error retrieving active crises'
+    });
+  }
+};
+
+exports.getCrisisEvents = async (req, res) => {
+  try {
+    console.log('Getting crisis events with query:', req.query);
+    
+    let query = {};
+    
+    // Build query based on parameters
+    if (req.query.type) {
+      query.crisisType = req.query.type;
+    }
+    
+    if (req.query.severity) {
+      query.severity = req.query.severity;
+    }
+    
+    if (req.query.country) {
+      query['affectedCountries.countryCode'] = req.query.country.toUpperCase();
+    }
+    
+    if (req.query.active === 'true') {
+      query.isActive = true;
+      query.endDate = { $exists: false };
+    }
+
+    // Execute query with pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const startIndex = (page - 1) * limit;
+
+    const crises = await CrisisEvent.find(query)
+      .sort({ startDate: -1 })
+      .limit(limit)
+      .skip(startIndex);
+
+    const total = await CrisisEvent.countDocuments(query);
+
+    console.log(`Found ${crises.length} crisis events`);
+
+    res.status(200).json({
+      success: true,
+      count: crises.length,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      },
+      data: crises
+    });
+  } catch (error) {
+    console.error('Get crisis events error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error retrieving crisis events'
     });
   }
 };

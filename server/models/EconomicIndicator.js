@@ -70,7 +70,16 @@ const economicIndicatorSchema = new mongoose.Schema({
     default: 'High'
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: {
+    transform(doc, ret) {
+      // Convert Decimal128 to number
+      if (ret.value != null && ret.value.toString) {
+        ret.value = parseFloat(ret.value.toString());
+      }
+      return ret;
+    }
+  }
 });
 
 // Compound indexes for efficient querying
