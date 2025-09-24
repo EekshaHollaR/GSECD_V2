@@ -6,18 +6,21 @@ const morgan = require('morgan');
 const compression = require('compression');
 require('dotenv').config();
 const crisisDetectionRoutes = require('./routes/crisis-detection');
+const socialIndicatorRoutes = require('./routes/socialIndicators');
+const alertRoutes = require('./routes/alerts');
 
 // Route imports
 const authRoutes = require('./routes/auth');
 const indicatorRoutes = require('./routes/indicators');
 const crisisRoutes = require('./routes/crisis');
 const externalDataRoutes = require('./routes/external-data');
+const { syncData } = require('./scheduler/dataSync');
 
 // Middleware imports
 const { generalLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Security and performance middleware
 app.use(helmet({
@@ -66,6 +69,8 @@ app.use('/api/indicators', indicatorRoutes);
 app.use('/api/crisis', crisisRoutes);
 app.use('/api/external-data', externalDataRoutes);
 app.use('/api/crisis-detection', crisisDetectionRoutes);
+app.use('/api/social-indicators', socialIndicatorRoutes);
+app.use('/api/alerts', alertRoutes);
 
 // 404 handler
 app.all('*', (req, res) => {
@@ -141,8 +146,8 @@ app.use((error, req, res, next) => {
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true,
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
@@ -200,6 +205,11 @@ process.on('SIGTERM', () => {
   server.close(() => {
     console.log('Process terminated');
   });
+});
+
+startServer().then(() => {
+  // Immediately run sync on startup
+  syncData();
 });
 
 startServer();

@@ -25,6 +25,7 @@ class WorldBankService {
   }
 
   // Fetch data for specific indicator and countries
+  
   async fetchIndicatorData(indicatorCode, countries = 'all', dateRange = '2010:2023') {
     try {
       const url = `${this.baseURL}/country/${countries}/indicator/${indicatorCode}`;
@@ -119,7 +120,7 @@ class WorldBankService {
   }
 
   // Sync key economic indicators
-  async syncKeyIndicators(countries = ['USA', 'CHN', 'JPN', 'DEU', 'GBR']) {
+  async fetchLatestIndicators(countries = ['USA', 'CHN', 'JPN', 'DEU', 'GBR']) {
     const keyIndicators = [
       'NY.GDP.MKTP.CD', // GDP (current US$)
       'NY.GDP.PCAP.CD', // GDP per capita (current US$)
