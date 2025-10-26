@@ -41,16 +41,4 @@ exports.getCorrelationMatrix = async (req, res) => {
   res.json({ success:true, data: matrix });
 };
 
-// server/routes/analysis.js
-const express = require('express');
-const { getCorrelationMatrix } = require('../controllers/analysis');
-const router = express.Router();
-const { protect } = require('../middleware/auth');
 
-router.get('/correlation', protect, getCorrelationMatrix);
-
-module.exports = router;
-
-// In server/app.js
-const analysisRoutes = require('./routes/analysis');
-app.use('/api/analysis', analysisRoutes);

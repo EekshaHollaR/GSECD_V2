@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const http= require('http');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -8,6 +9,7 @@ require('dotenv').config();
 const crisisDetectionRoutes = require('./routes/crisis-detection');
 const socialIndicatorRoutes = require('./routes/socialIndicators');
 const alertRoutes = require('./routes/alerts');
+const analysisRoutes = require('./routes/analysis');
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -20,7 +22,7 @@ const { syncData } = require('./scheduler/dataSync');
 const { generalLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 // Security and performance middleware
 app.use(helmet({
@@ -71,6 +73,7 @@ app.use('/api/external-data', externalDataRoutes);
 app.use('/api/crisis-detection', crisisDetectionRoutes);
 app.use('/api/social-indicators', socialIndicatorRoutes);
 app.use('/api/alerts', alertRoutes);
+app.use('/api/analysis', analysisRoutes);
 
 // 404 handler
 app.all('*', (req, res) => {
@@ -212,4 +215,4 @@ startServer().then(() => {
   syncData();
 });
 
-startServer();
+// startServer();

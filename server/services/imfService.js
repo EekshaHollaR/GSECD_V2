@@ -9,7 +9,7 @@ class IMFService {
   // Get available indicators from IMF
   async getIndicators() {
     try {
-      const response = await axios.get(`${this.baseURL}/indicators`);
+      const response = await axios.get(`${zthis.baseURL}/indicators`);
       return response.data.indicators;
     } catch (error) {
       console.error('IMF indicators fetch error:', error);
