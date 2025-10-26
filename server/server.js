@@ -10,7 +10,7 @@ const crisisDetectionRoutes = require('./routes/crisis-detection');
 const socialIndicatorRoutes = require('./routes/socialIndicators');
 const alertRoutes = require('./routes/alerts');
 const analysisRoutes = require('./routes/analysis');
-
+const countryRoutes = require('./routes/countries');
 // Route imports
 const authRoutes = require('./routes/auth');
 const indicatorRoutes = require('./routes/indicators');
@@ -74,6 +74,7 @@ app.use('/api/crisis-detection', crisisDetectionRoutes);
 app.use('/api/social-indicators', socialIndicatorRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/analysis', analysisRoutes);
+app.use('/api/countries', countryRoutes);
 
 // 404 handler
 app.all('*', (req, res) => {
